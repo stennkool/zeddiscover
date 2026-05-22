@@ -1,0 +1,35 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  BINARY: zeddiscover
+  INSTALL_DIR: '{{.HOME}}/.local/bin'
+
+tasks:
+  default:
+    desc: Run a dry-run sync of all providers
+    cmds:
+      - go run . --dry-run
+
+  run:
+    desc: Run the application (use -- --provider <name> for a single provider)
+    cmds:
+      - go run . {{.CLI_ARGS}}
+
+  build:
+    desc: Build the zeddiscover binary
+    cmds:
+      - go build -o {{.BINARY}} .
+    generates:
+      - "{{.BINARY}}"
+
+  install:
+    desc: Build and install zeddiscover to {{.INSTALL_DIR}}
+    deps: [build]
+    cmds:
+      - mkdir -p {{.INSTALL_DIR}}
+      - install -m 755 {{.BINARY}} {{.INSTALL_DIR}}/{{.BINARY}}
+      - echo "Installed {{.BINARY}} → {{.INSTALL_DIR}}/{{.BINARY}}"
+    status:
+      - test -f {{.INSTALL_DIR}}/{{.BINARY}}
