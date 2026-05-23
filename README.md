@@ -64,6 +64,22 @@ task                          # shortcut: dry-run all
 
 ### Taskfile shortcuts
 
+The project uses [Task](https://taskfile.dev) — a modern, Go-powered task runner
+that replaces Makefile with a simpler YAML syntax.  Install it with:
+
+```sh
+# macOS
+brew install go-task
+
+# Linux
+sh -c "$(curl -sL https://taskfile.dev/install.sh)"
+
+# Or via Go
+go install github.com/go-task/task/v3/cmd/task@latest
+```
+
+Once installed, these shortcuts are available from the repo root:
+
 | Command         | What it does                          |
 | --------------- | ------------------------------------- |
 | `task`          | Dry-run sync (`go run . --dry-run`)   |
