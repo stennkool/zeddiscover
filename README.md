@@ -81,6 +81,15 @@ task                          # shortcut: dry-run all
 4. **Back up** — copies `settings.json` → `settings.json.bak` before touching the file.
 5. **Write** — replaces each provider's `available_models` array and saves.
 
+## Caveats
+
+**No authentication is sent.** Requests to `/models` endpoints are made without
+an `Authorization` header.  If a provider requires an API key to list models
+(e.g., Xiaomi), that provider will be **skipped** with an HTTP 401 error.
+
+Providers that expose their `/models` endpoint unauthenticated (such as
+OpenRouter, Kilo, and Synthetic) work without any extra configuration.
+
 ## Configuration in Zed
 
 Define one or more OpenAI-compatible providers in your Zed `settings.json`:
