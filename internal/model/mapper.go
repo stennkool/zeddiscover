@@ -7,10 +7,10 @@ import "slices"
 // IsTextOnly returns true when the model only produces text output.
 // Models that also output images, audio, or video are excluded.
 func (m APIModel) IsTextOnly() bool {
-	if len(m.Architecture.OutputModalities) == 0 {
+	if len(m.outputMods()) == 0 {
 		return true // no modalities listed → assume text-only
 	}
-	for _, mod := range m.Architecture.OutputModalities {
+	for _, mod := range m.outputMods() {
 		if mod != "text" {
 			return false
 		}
@@ -21,16 +21,16 @@ func (m APIModel) IsTextOnly() bool {
 // ─── Capability detection ───────────────────────────────────────────────────
 
 func hasImageInput(m APIModel) bool {
-	return slices.Contains(m.Architecture.InputModalities, "image")
+	return slices.Contains(m.inputMods(), "image")
 }
 
 func hasToolSupport(m APIModel) bool {
-	return slices.Contains(m.SupportedParams, "tools")
+	return slices.Contains(m.supportedParams(), "tools")
 }
 
 func hasReasoningSupport(m APIModel) bool {
-	return slices.Contains(m.SupportedParams, "reasoning") ||
-		slices.Contains(m.SupportedParams, "include_reasoning")
+	return slices.Contains(m.supportedParams(), "reasoning") ||
+		slices.Contains(m.supportedParams(), "include_reasoning")
 }
 
 // ─── Mapping ────────────────────────────────────────────────────────────────
@@ -41,6 +41,8 @@ func MapToAvailableModel(m APIModel) AvailableModel {
 	maxCompletion := maxTokens // sensible fallback when provider doesn't specify
 	if m.TopProvider.MaxCompletionTokens != nil {
 		maxCompletion = *m.TopProvider.MaxCompletionTokens
+	} else if m.MaxOutputTokens > 0 {
+		maxCompletion = m.MaxOutputTokens
 	}
 
 	return AvailableModel{

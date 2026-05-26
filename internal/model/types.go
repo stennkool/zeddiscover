@@ -25,12 +25,44 @@ type AvailableModel struct {
 
 // APIModel is a single model as returned by an OpenRouter-style /models endpoint.
 type APIModel struct {
-	ID              string       `json:"id"`
-	Name            string       `json:"name"`
-	ContextLength   int64        `json:"context_length"`
-	Architecture    Architecture `json:"architecture"`
-	TopProvider     TopProvider  `json:"top_provider"`
-	SupportedParams []string     `json:"supported_parameters"`
+	ID                string       `json:"id"`
+	Name              string       `json:"name"`
+	ContextLength     int64        `json:"context_length"`
+	Architecture      Architecture `json:"architecture"`
+	TopProvider       TopProvider  `json:"top_provider"`
+	SupportedParams   []string     `json:"supported_parameters"`
+	// Fallback fields for providers that don't use the OpenRouter nested schema
+	InputModalities   []string     `json:"input_modalities"`
+	OutputModalities  []string     `json:"output_modalities"`
+	SupportedFeatures []string     `json:"supported_features"`
+	MaxOutputTokens   int64        `json:"max_output_tokens,omitempty"`
+}
+
+// inputMods returns the input modalities, preferring the nested Architecture field
+// and falling back to the top-level flat field.
+func (m *APIModel) inputMods() []string {
+	if len(m.Architecture.InputModalities) > 0 {
+		return m.Architecture.InputModalities
+	}
+	return m.InputModalities
+}
+
+// outputMods returns the output modalities, preferring the nested Architecture field
+// and falling back to the top-level flat field.
+func (m *APIModel) outputMods() []string {
+	if len(m.Architecture.OutputModalities) > 0 {
+		return m.Architecture.OutputModalities
+	}
+	return m.OutputModalities
+}
+
+// supportedParams returns the supported parameters / features, preferring
+// the OpenRouter-style field and falling back to the top-level flat field.
+func (m *APIModel) supportedParams() []string {
+	if len(m.SupportedParams) > 0 {
+		return m.SupportedParams
+	}
+	return m.SupportedFeatures
 }
 
 // Architecture describes input/output modalities.
